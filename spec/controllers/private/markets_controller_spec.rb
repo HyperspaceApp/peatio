@@ -2,10 +2,11 @@
 # frozen_string_literal: true
 
 describe Private::MarketsController, type: :controller do
-  let(:member) { create :member, :level_3 }
-  before { session[:member_id] = member.id }
+  let(:member) { create(:member, level: 3) }
 
   context 'logged in user' do
+    before(:each) { inject_authorization!(member) }
+
     describe 'GET /markets/btcusd' do
       before { get :show, data }
 
@@ -14,9 +15,8 @@ describe Private::MarketsController, type: :controller do
   end
 
   context 'non-login user' do
-    before { session[:member_id] = nil }
-
     describe 'GET /markets/btcusd' do
+      before { eject_authorization! }
       before { get :show, data }
 
       it { expect(response.status).to eq 200 }
@@ -25,6 +25,7 @@ describe Private::MarketsController, type: :controller do
   end
 
   describe 'ability to disable markets UI' do
+    before(:each) { inject_authorization!(member) }
 
     context 'when market UI is enabled' do
       before { ENV['DISABLE_MARKETS_UI'] = nil }
