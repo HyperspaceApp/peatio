@@ -10,7 +10,8 @@ module WalletService
 
     # TODO: deal with fee substraction
     def collect_deposit!(deposit, options={})
-      destination_address = destination_wallet(deposit).address
+    Rails.logger.debug deposit
+    destination_address = destination_wallet(deposit).address
       pa = deposit.account.payment_address
 
       # this will automatically deduct fee from amount

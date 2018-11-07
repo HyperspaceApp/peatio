@@ -36,7 +36,7 @@ module WalletClient
     end
 
     def convert_to_hastings(amount)
-      return amount * 1e24
+      return (amount * 1e24).round
     end
 
     def valid_address?(address)
@@ -56,20 +56,8 @@ module WalletClient
 
     def rest_api(verb, path, data = nil, raise_error = true)
       args = [path]
-
-      if data
-        if verb.in?(%i[ post put patch ])
-          args << data.compact.to_json
-          args << { 'Content-Type' => 'application/json' }
-        else
-          args << data.compact
-          args << {}
-        end
-      else
-        args << nil
-        args << {}
-      end
-
+      args << data
+      args << {}
       args.last['Accept']        = 'application/json'
       args.last['User-Agent']        = 'Hyperspace-Agent'
 

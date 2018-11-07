@@ -86,22 +86,10 @@ module BlockchainClient
 
     def rest_api(verb, path, data = nil, raise_error = true)
       args = [path]
-
-      if data
-        if verb.in?(%i[ post put patch ])
-          args << data.compact.to_json
-          args << { 'Content-Type' => 'application/json' }
-        else
-          args << data.compact
-          args << {}
-        end
-      else
-        args << nil
-        args << {}
-      end
-
-      args.last['Accept']     = 'application/json'
-      args.last['User-Agent'] = 'Hyperspace-Agent'
+      args << data
+      args << {}
+      args.last['Accept']        = 'application/json'
+      args.last['User-Agent']        = 'Hyperspace-Agent'
 
       response = connection.send(verb, *args)
       Rails.logger.debug { response.describe }
