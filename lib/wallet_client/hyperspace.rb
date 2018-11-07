@@ -71,7 +71,7 @@ module WalletClient
       end
 
       args.last['Accept']        = 'application/json'
-      args.last['User-agent']        = 'Hyperspace-Agent'
+      args.last['User-Agent']        = 'Hyperspace-Agent'
 
       response = connection.send(verb, *args)
       Rails.logger.debug { response.describe }

@@ -44,7 +44,7 @@ module BlockchainClient
 
         {
           amount: convert_from_hastings(item.fetch('value').to_d),
-          address: normalize_address(item['scriptPubKey']['addresses'][0])
+          address: normalize_address(item['unlockhash'])
         }
       end.compact
 
@@ -57,10 +57,17 @@ module BlockchainClient
       return h / 1e24
     end
 
-    # def get_unconfirmed_txns
-    #   path = '/wallet/transactions'
-    #   rest_api(:get, path).fetch('unconfirmedtransactions').map()
-    # end
+    def get_unconfirmed_txns
+      path = '/wallet/transactions'
+      wallet_txns = rest_api(:get, path).fetch('unconfirmedtransactions')
+      return if wallet_txns.nil?
+      wallet_txns.map do |item|
+        {
+          'id' => item.fetch('transactionid'),
+          'siacoinoutputs' => item.fetch('transaction').fetch('siacoinoutputs')
+        }
+      end.compact
+    end
 
     # def get_raw_transaction(txid)
     #   json_rpc(:getrawtransaction, [txid, true]).fetch('result')
@@ -93,8 +100,8 @@ module BlockchainClient
         args << {}
       end
 
-      args.last['Accept']        = 'application/json'
-      args.last['User-agent']        = 'Hyperspace-Agent'
+      args.last['Accept']     = 'application/json'
+      args.last['User-Agent'] = 'Hyperspace-Agent'
 
       response = connection.send(verb, *args)
       Rails.logger.debug { response.describe }
